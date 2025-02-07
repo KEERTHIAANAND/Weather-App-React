@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
+import proptypes from "prop-types";
 
 import searchicon from "./assets/search.png";
 import clearicon from "./assets/clear.png";
@@ -49,12 +50,23 @@ const WeatherDetails = ({ icon, temp, city, country, lat, log, humidity, wind })
   );
 };
 
+WeatherDetails.proptypes ={
+  icon: proptypes.string.isRequired,
+  temp: proptypes.number.isRequired,
+  city: proptypes.string.isRequired,
+  country: proptypes.string.isRequired,
+  humidity: proptypes.number.isRequired,
+  wind: proptypes.number.isRequired,
+  lat: proptypes.number.isRequired,
+  lag: proptypes.number.isRequired,
+}
+
 function App() {
-  let api_key="e867398c308c968246fe8d4c2203432f";
+  let api_key="4b9b8688eca407ea3546cf525c8f03cb";
   const [text,setText]=useState("Erode");
   const [icon, setIcon] = useState(snowicon);
   const [temp, setTemp] = useState(0);
-  const [city, setCity] = useState("coimbatore");
+  const [city, setCity] = useState("Erode");
   const [country, setCountry] = useState("IN");
   const [lat, setLat] = useState(0);
   const [log, setLog] = useState(0);
@@ -62,12 +74,30 @@ function App() {
   const [wind, setWind] = useState(0);
   const [citynotfound, setCityNotFound] = useState(false);
   const [loading, setLoading] = useState(false);
+  const[error,setError] = useState(null);
+
+  const weathericonmap = {
+    "01d" : clearicon,
+    "01n" : clearicon,
+    "02d" : cloudicon,
+    "02n" : cloudicon,
+    "03d" : drizzleicon,
+    "03n" : drizzleicon,
+    "04d" : drizzleicon,
+    "04n" : drizzleicon,
+    "09d" : rainicon,
+    "09n" : rainicon,
+    "10d" : rainicon,
+    "10n" : rainicon,
+    "13d" : snowicon,
+    "13n" : snowicon,
+  }
   
 
   const search=async () => {
     setLoading(true);
 
-    let url ="https://api.openweathermap.org/data/2.5/weather?q=${text}&appid=e867398c308c968246fe8d4c2203432f&units=Metric";
+    let url = `https://api.openweathermap.org/data/2.5/weather?q=${text}&appid=4b9b8688eca407ea3546cf525c8f03cb&units=Metric`;
 
     try{
       
@@ -76,9 +106,26 @@ function App() {
       console.log(data);
       if(data.cod==="404"){
         console.error("City Not Found");
+        setCityNotFound(true);
+        setLoading(false);
+        return;
       }
+
+      setHumidity(data.main.humidity);
+      setWind(data.wind.speed);
+      setTemp(Math.floor(data.main.temp));
+      setCity(data.name);
+      setCountry(data.sys.country);
+      setLog(data.coord.lon);
+      setLat(data.coord.lat);
+
+      const weathericoncode = data.weather[0].icon;
+      setIcon(weathericoncode[weathericoncode] || clearicon);
+      setCityNotFound(false);
+
     }catch(error){
       console.error("An Error Occurred:",error.message);
+      setError("An error occured while fetching weather data.");
     }finally{
       setLoading(false);
     }
@@ -94,6 +141,10 @@ function App() {
     }
   };
 
+  useEffect(function (){
+    search()
+  },[]);
+
   return (
     <>
       <div className="container">
@@ -103,7 +154,12 @@ function App() {
             <img src={searchicon} alt="search" />
           </div>
         </div>
-        <WeatherDetails icon={icon} temp={temp} city={city} country={country} lat={lat} log={log} wind={wind} humidity={humidity} />
+        
+        {loading && <div className="loading-message">Loading...</div>}
+        {error && <div className="error-message">{error}</div>}
+        {citynotfound && <div className="city-not-found">City Not Found</div>}
+
+        {!loading && !citynotfound && <WeatherDetails icon={icon} temp={temp} city={city} country={country} lat={lat} log={log} wind={wind} humidity={humidity} />}
         <p className="copyright">Designed by <span>KEERTHI</span></p>
       </div>
     </>

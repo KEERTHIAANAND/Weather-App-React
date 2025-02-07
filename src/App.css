@@ -6,7 +6,7 @@
 body{
     margin:0;
     padding: 0;
-    background-image:linear-gradient(to top, #808080 0%, #020024 100%);
+    background: linear-gradient(to bottom, #0099ff 0%, #ffffff 100%);
     width:100vw;
     height:100vh;
     display: flex;
@@ -138,3 +138,12 @@ body{
     color:#020024
 }
 
+.city-not-found,
+.loading-message,
+.error-message{
+    margin-top: 10px;
+    color: #be0a0a;
+    font-size: 20px;
+    font-weight: 400;
+    text-align: center;
+}
