@@ -65,7 +65,7 @@ function App() {
   let api_key="4b9b8688eca407ea3546cf525c8f03cb";
   const [text,setText]=useState("Erode");
   const [icon, setIcon] = useState(snowicon);
-  const [temp, setTemp] = useState(0);
+  const [temp, setTemp] = useState(0); 
   const [city, setCity] = useState("Erode");
   const [country, setCountry] = useState("IN");
   const [lat, setLat] = useState(0);
